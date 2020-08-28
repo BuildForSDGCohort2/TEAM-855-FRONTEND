@@ -1,32 +1,46 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <TopNavigation v-if="user" />
+    <div class="container-fluid">
+      <div class="row">
+        <SideNavigation v-if="user" />
+        <router-view />
+      </div>
     </div>
-    <router-view />
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+<script>
+import TopNavigation from "@/components/TopNavigation";
+import SideNavigation from "@/components/SideNavigation";
+import { mapActions, mapGetters } from "vuex";
+export default {
+  name: "App",
+  data() {
+    return {
+      isLoggedIn: false,
+      businesses: null
+    };
+  },
+  components: {
+    TopNavigation,
+    SideNavigation
+  },
+  methods: {
+    ...mapActions(["logout"]),
+    logoutUser() {
+      this.logout();
+    },
+    ...mapActions(["getProfile"])
+  },
+  computed: {
+    ...mapGetters(["user"])
+  },
+  mounted() {
+    this.isLoggedIn = this.$store.getters.isLoggedIn;
+    if (this.isLoggedIn) {
+      this.getProfile();
+    }
+  }
+};
+</script>
