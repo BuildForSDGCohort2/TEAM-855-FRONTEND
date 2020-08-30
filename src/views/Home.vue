@@ -4,22 +4,8 @@
       class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
     >
       <h1 class="h2">Dashboard</h1>
-      <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group mr-2">
-          <button type="button" class="btn btn-sm btn-outline-secondary">
-            Share
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-secondary">
-            Export
-          </button>
-        </div>
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-secondary dropdown-toggle"
-        >
-          <span data-feather="calendar"></span>
-          This week
-        </button>
+      <div class="mb-2 mb-md-0">
+        <p>Dashboard</p>
       </div>
     </div>
     <div>
@@ -55,7 +41,68 @@
           </div>
         </div>
       </div>
-      <div v-else></div>
+      <div v-else class="container-fluid">
+        <div class="row">
+          <div class="border-0 mb-4 mt-5 px-md-5 col-md-12">
+            <div
+              v-if="organisations.length == 0"
+              class="text-center px-5 py-5 bg-translucent-success"
+            >
+              <h4 class="mb-3">
+                You currently don't have a registered organisation on our
+                platform
+              </h4>
+              <a class="btn btn-primary" href="/register-organisation"
+                >Register an organisation</a
+              >
+            </div>
+            <div v-else>
+              <div class="col-md-12">
+                <a href="/register-organisation" class="mb-5 btn btn-success"
+                  >Register an Organisation</a
+                >
+                <div class="row">
+                  <div
+                    class="col-md-4 mb-3"
+                    v-for="(organisation, index) in organisations"
+                    :key="index"
+                  >
+                    <a
+                      @click="goToOrganisation(organisation._id)"
+                      class="card bg-primary organisation-card"
+                    >
+                      <div class="card-body">
+                        <div class="media">
+                          <div class="media-body">
+                            <h4 class="mb-0 text-white">
+                              {{ organisation.name }}
+                            </h4>
+                            <p class="text-success" v-if="organisation.active">
+                              Activated
+                            </p>
+                            <p class="text-danger" v-else>Not active</p>
+                          </div>
+
+                          <div
+                            class="avatar-sm rounded-circle align-self-center"
+                          >
+                            <span class="avatar-title">
+                              <img
+                                src="img/icons/building.svg"
+                                class="company-icon"
+                              />
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </template>
@@ -79,7 +126,7 @@ const Toast = Swal.mixin({
 
 import axios from "axios";
 import { RestURI } from "../config/api";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
   name: "Home",
   data() {
@@ -87,7 +134,8 @@ export default {
   },
   components: {},
   computed: {
-    ...mapGetters(["user"])
+    ...mapGetters(["user"]),
+    ...mapGetters(["organisations"])
   },
   methods: {
     confirmEmail() {
@@ -102,7 +150,25 @@ export default {
           title: res.data.msg
         });
       });
+    },
+    ...mapActions(["getOrganisations"]),
+    goToOrganisation(val) {
+      let id = val;
+      this.$router.push(`/dashboard/${id}`);
     }
+  },
+  beforeMount() {
+    this.getOrganisations();
   }
 };
 </script>
+
+<style scoped>
+.company-icon {
+  height: 60px;
+  width: 60px;
+}
+.organisation-card {
+  border-left: 6px solid #4bbf73;
+}
+</style>

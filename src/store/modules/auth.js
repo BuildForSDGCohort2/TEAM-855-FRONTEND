@@ -71,6 +71,7 @@ const actions = {
           axios.defaults.headers.common["Authorization"] = token;
           commit("auth_success", user);
           commit("auth_success", token);
+          router.push("/");
         }
       })
       .catch(error => {
